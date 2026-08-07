@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASDAQ 100 Dashboard</title>
+<link rel="stylesheet" href="css/css_dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <header class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">NASDAQ 100 Dashboard</h1>
+      <p class="page-subtitle" id="pageDate">Data as of --</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" id="refreshBtn" onclick="loadAll()">
+        <span id="btnSpin" class="spin" style="display:none;"></span>
+        <span id="btnText">Actualizar</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="alert danger" id="alertBox"></div>
+
+  <!-- Grid 5x3 -->
+  <div class="stock-grid" id="gridRow1"></div>
+  <div class="stock-grid" id="gridRow2"></div>
+  <div class="stock-grid" id="gridRow3"></div>
+
+  <!-- Fila de gráfico dinámico -->
+  <div class="chart-row" id="chartRow">
+    <div class="chart-header">
+      <div class="chart-title-group">
+        <span class="chart-symbol" id="chartSymbol">AAPL</span>
+        <span class="chart-name" id="chartName">Apple Inc.</span>
+        <span class="chart-price" id="chartPrice">--</span>
+        <span class="chart-change" id="chartChange">--</span>
+      </div>
+      <div class="timeframes">
+        <button class="tf-btn" onclick="setTimeframe('1D')">1D</button>
+        <button class="tf-btn" onclick="setTimeframe('1W')">1W</button>
+        <button class="tf-btn active" onclick="setTimeframe('1M')">1M</button>
+        <button class="tf-btn" onclick="setTimeframe('3M')">3M</button>
+        <button class="tf-btn" onclick="setTimeframe('6M')">6M</button>
+        <button class="tf-btn" onclick="setTimeframe('1Y')">1Y</button>
+        <button class="tf-btn" onclick="setTimeframe('MAX')">MAX</button>
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="mainChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-row" id="indexBar">
+    <div class="stat-card">
+      <div class="stat-label">Estado</div>
+      <div class="stat-value" id="statStatus">Esperando</div>
+      <div class="stat-sub" id="statStatusSub">Presiona Actualizar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Acciones</div>
+      <div class="stat-value" id="statCount">--</div>
+      <div class="stat-sub">Cargadas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Alzas / Bajas</div>
+      <div class="stat-value" id="statGainers">-- / --</div>
+      <div class="stat-sub" id="statTrend">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Actualizado</div>
+      <div class="stat-value" id="statDate">--</div>
+      <div class="stat-sub" id="statTime">--</div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <div class="page-footer">
+      <span class="page-footer">Datos históricos via cloudflare <img src="img/cloudflare-svgrepo-com.svg"> D1 + Finnhub <img src="img/finnhub.png"> API</span>
+    </div>
+  </footer>
+</div>
+
+<script src="js/js_dashboard.js"></script>
+</body>
+</html>
