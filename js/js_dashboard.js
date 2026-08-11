@@ -217,18 +217,54 @@ async function loadChart(symbol, timeframe) {
   if (s) updateChartHeader(s);
 
   try {
-    const hist = await fetchAPI("/api/history?symbol=" + encodeURIComponent(symbol) + "&period=" + timeframe);
-    const points = hist.data || [];
+    let points = [];
+    
+    // ── NUEVO: usar /api/candles para periodos largos (datos reales de Finnhub)
+    if (timeframe !== '1D') {
+      const now = new Date();
+      const to = now.toISOString().split('T')[0];
+      let from = new Date();
+      switch (timeframe) {
+        case '1W': from.setDate(now.getDate() - 7); break;
+        case '1M': from.setDate(now.getDate() - 30); break;
+        case '3M': from.setDate(now.getDate() - 90); break;
+        case '6M': from.setDate(now.getDate() - 180); break;
+        case '1Y': from.setDate(now.getDate() - 365); break;
+        case 'MAX': from = new Date('2010-01-01'); break;
+      }
+      const fromStr = from.toISOString().split('T')[0];
+      const candles = await fetchAPI(`/api/candles?symbol=${encodeURIComponent(symbol)}&resolution=D&from=${fromStr}&to=${to}`);
+      points = (candles.data || []).map(c => ({
+        timestamp: c.timestamp,
+        price: c.close,
+        day_high: c.high,
+        day_low: c.low,
+        open: c.open,
+        volume: c.volume
+      }));
+    } else {
+      // 1D: usar datos del cron (granularidad de 5 min)
+      const hist = await fetchAPI("/api/history?symbol=" + encodeURIComponent(symbol) + "&period=" + timeframe);
+      points = hist.data || [];
+    }
 
     if (points.length === 0) {
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
       return;
     }
 
+    // Detectar si todos los puntos son del mismo día
+    const firstDate = new Date(points[0].timestamp * 1000).toDateString();
+    const allSameDay = points.every(p => new Date(p.timestamp * 1000).toDateString() === firstDate);
+
     const labels = points.map(p => {
       const d = new Date(p.timestamp * 1000);
-      return timeframe === '1D' ? d.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) : d.toLocaleDateString('es-ES', {day:'numeric', month:'short'});
+      if (timeframe === '1D' || allSameDay) {
+        return d.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+      }
+      return d.toLocaleDateString('es-ES', {day:'numeric', month:'short'});
     });
+    
     const prices = points.map(p => p.price);
     const last = points[points.length - 1];
     const first = points[0];
@@ -288,7 +324,8 @@ async function loadChart(symbol, timeframe) {
             grid: { color: 'rgba(225,228,232,0.6)', drawBorder: false },
             ticks: {
               color: '#5f6b7a',
-              callback: function(value) { return '$' + value.toFixed(0); }
+              // ── NUEVO: 2 decimales en vez de enteros ─────────────
+              callback: function(value) { return '$' + value.toFixed(2); }
             }
           }
         }
