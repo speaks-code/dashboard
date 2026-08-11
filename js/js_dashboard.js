@@ -82,13 +82,10 @@ async function loadAll() {
     renderGrid();
     updateStats();
 
-    // Seleccionar el primero si no hay selección
     if (!stockData.find(s => s.symbol === currentSymbol)) {
       currentSymbol = stockData[0]?.symbol || "AAPL";
     }
     await loadChart(currentSymbol, currentTimeframe);
-
-    // Cargar nombres y métricas en segundo plano
     loadDetailsInBackground();
 
   } catch (e) {
@@ -118,7 +115,7 @@ function renderGrid() {
     const sign = s.changePercent >= 0 ? "+" : "";
     const arrow = s.changePercent >= 0 ? "▲" : "▼";
 
-        card.innerHTML = `
+    card.innerHTML = `
       <div class="stock-top-row">
         <div class="stock-symbol">${s.symbol}</div>
         <div class="stock-price">$${s.price.toFixed(2)}</div>
@@ -152,17 +149,17 @@ function updateStats() {
   const loaded = stockData.filter(s => s.price > 0).length;
   const gainers = stockData.filter(s => s.changePercent > 0).length;
   const losers = stockData.filter(s => s.changePercent < 0).length;
-  const errors = stockData.length - loaded;
+  const flat = stockData.filter(s => s.changePercent === 0 && s.price > 0).length;
 
-  $("statStatus").textContent = errors > 0 ? "Parcial" : "Conectado";
-  $("statStatusSub").textContent = errors > 0 ? errors + " sin datos" : "D1 + Finnhub";
-  $("statStatusSub").className = "stat-sub" + (errors > 0 ? " down" : "");
+  $("statStatus").textContent = loaded === SYMBOLS.length ? "Conectado" : "Parcial";
+  $("statStatusSub").textContent = loaded === SYMBOLS.length ? "D1 + Finnhub" : (SYMBOLS.length - loaded) + " sin datos";
+  $("statStatusSub").className = "stat-sub" + (loaded < SYMBOLS.length ? " down" : "");
 
-  $("statCount").textContent = loaded + "/" + stockData.length;
+  $("statCount").textContent = loaded + "/" + SYMBOLS.length;
 
   $("statGainers").textContent = gainers + " / " + losers;
-  $("statTrend").textContent = gainers >= losers ? "Sesión alcista" : "Sesión bajista";
-  $("statTrend").className = "stat-sub " + (gainers >= losers ? "up" : "down");
+  $("statTrend").textContent = gainers > losers ? "Sesión alcista" : (losers > gainers ? "Sesión bajista" : "Sesión mixta");
+  $("statTrend").className = "stat-sub " + (gainers > losers ? "up" : (losers > gainers ? "down" : ""));
 
   $("statDate").textContent = dateStr;
   $("statTime").textContent = timeStr;
@@ -204,7 +201,7 @@ function updateChartHeader(s) {
   chg.className = "chart-change " + cls;
 }
 
-// Gráfico histórico
+// ── GRÁFICO CORREGIDO ───────────────────────────────────────────────────────
 async function loadChart(symbol, timeframe) {
   currentSymbol = symbol;
   currentTimeframe = timeframe;
@@ -217,36 +214,8 @@ async function loadChart(symbol, timeframe) {
   if (s) updateChartHeader(s);
 
   try {
-    let points = [];
-    
-    // ── NUEVO: usar /api/candles para periodos largos (datos reales de Finnhub)
-    if (timeframe !== '1D') {
-      const now = new Date();
-      const to = now.toISOString().split('T')[0];
-      let from = new Date();
-      switch (timeframe) {
-        case '1W': from.setDate(now.getDate() - 7); break;
-        case '1M': from.setDate(now.getDate() - 30); break;
-        case '3M': from.setDate(now.getDate() - 90); break;
-        case '6M': from.setDate(now.getDate() - 180); break;
-        case '1Y': from.setDate(now.getDate() - 365); break;
-        case 'MAX': from = new Date('2010-01-01'); break;
-      }
-      const fromStr = from.toISOString().split('T')[0];
-      const candles = await fetchAPI(`/api/candles?symbol=${encodeURIComponent(symbol)}&resolution=D&from=${fromStr}&to=${to}`);
-      points = (candles.data || []).map(c => ({
-        timestamp: c.timestamp,
-        price: c.close,
-        day_high: c.high,
-        day_low: c.low,
-        open: c.open,
-        volume: c.volume
-      }));
-    } else {
-      // 1D: usar datos del cron (granularidad de 5 min)
-      const hist = await fetchAPI("/api/history?symbol=" + encodeURIComponent(symbol) + "&period=" + timeframe);
-      points = hist.data || [];
-    }
+    const hist = await fetchAPI("/api/history?symbol=" + encodeURIComponent(symbol) + "&period=" + timeframe);
+    let points = hist.data || [];
 
     if (points.length === 0) {
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
@@ -264,7 +233,7 @@ async function loadChart(symbol, timeframe) {
       }
       return d.toLocaleDateString('es-ES', {day:'numeric', month:'short'});
     });
-    
+
     const prices = points.map(p => p.price);
     const last = points[points.length - 1];
     const first = points[0];
@@ -292,7 +261,7 @@ async function loadChart(symbol, timeframe) {
           borderWidth: 2,
           fill: true,
           tension: 0.1,
-          pointRadius: 0,
+          pointRadius: points.length < 10 ? 3 : 0,
           pointHoverRadius: 4
         }]
       },
@@ -324,8 +293,10 @@ async function loadChart(symbol, timeframe) {
             grid: { color: 'rgba(225,228,232,0.6)', drawBorder: false },
             ticks: {
               color: '#5f6b7a',
-              // ── NUEVO: 2 decimales en vez de enteros ─────────────
-              callback: function(value) { return '$' + value.toFixed(2); }
+              // ── CORREGIDO: 2 decimales en vez de enteros ─────────────
+              callback: function(value) { return '$' + value.toFixed(2); },
+              // Forzar al menos 5 ticks para que no se amontonen
+              maxTicksLimit: 6
             }
           }
         }
@@ -338,11 +309,11 @@ async function loadChart(symbol, timeframe) {
 }
 
 function setTimeframe(tf) {
+  currentTimeframe = tf;
   loadChart(currentSymbol, tf);
 }
 
-// Auto-refresh cada 30 segundos
-setInterval(() => { if (!document.hidden) loadAll(); }, 30000);
-
-// Carga inicial
-document.addEventListener("DOMContentLoaded", loadAll);
+// Inicializar
+document.addEventListener("DOMContentLoaded", () => {
+  loadAll();
+});
