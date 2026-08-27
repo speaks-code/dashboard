@@ -1,10 +1,6 @@
 Creative Commons Atribución-NoComercial-CompartirIgual (CC BY-NC-SA 4.0).
 
 AVISO LEGAL IMPORTANTE
-
-Este texto ha sido redactado por una IA y no constituye asesoría legal. Las licencias personalizadas pueden tener vacíos legales, conflictos con otras licencias o ser difíciles de hacer cumplir. Si tu proyecto es muy grande o genera dinero indirectamente, consulta a un abogado. Para la mayoría de proyectos, usar una licencia estándar como CC BY-NC-SA 4.0 es mucho más seguro.
-Licencia Pública No-Comercial con Copyleft (LPNC) v1.0
-
 Copyright (C) [2026] [Negrete Horacio]
 
 Esta Licencia Pública No-Comercial con Copyleft ("Licencia") aplica a todo el software y documentación asociada contenida en este repositorio. Al utilizar, copiar, modificar o distribuir este software, usted acepta los términos y condiciones de esta Licencia.
