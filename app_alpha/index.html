@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OX ALPHA</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ======= SIDEBAR ======= -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h2 class="sidebar-title">MODELS</h2>
+        <label class="model-item">
+          <input type="radio" name="model" value="stealth/ox-alpha" checked />
+          <span class="model-dot"></span>
+          <span>
+            <strong>Ox Alpha</strong>
+            <small>stealth/ox-alpha</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="sidebar-section">
+        <h2 class="sidebar-title">PROVIDER</h2>
+        <div class="provider-item">
+          <span class="provider-badge">T</span>
+          <span>TokenRa</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section sidebar-actions">
+        <button id="btn-new-chat" class="btn-ghost" type="button">+ New chat</button>
+        <button id="btn-clear" class="btn-ghost danger" type="button">Clear history</button>
+      </div>
+    </aside>
+
+    <!-- ======= MAIN ======= -->
+    <main class="main">
+      <header class="topbar">
+        <span class="logo">OX ALPHA</span>
+        <span id="conn-status" class="conn-status">
+          <span id="conn-dot" class="conn-dot checking"></span>
+          <span id="conn-text">Checking…</span>
+        </span>
+      </header>
+
+      <section id="chat" class="chat" aria-live="polite"></section>
+
+      <footer class="composer">
+        <textarea id="input" rows="1" placeholder="Write your message..."></textarea>
+        <button id="btn-send" class="btn-send" type="button">SEND</button>
+      </footer>
+
+      <div class="statusbar">
+        <span>API: Cloudflare Worker</span>
+        <span id="status-model">Model: stealth/ox-alpha</span>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
