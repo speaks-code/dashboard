@@ -55,8 +55,14 @@ function renderGrid(containerId, entries) {
 /* ---------- 1. Red (Cloudflare Function) ---------- */
 
 async function fetchNetworkData() {
+  // Detectar si estamos en GitHub Pages o en Cloudflare Pages
+  const isGitHub = window.location.hostname.includes("github.io");
+  const apiUrl = isGitHub
+    ? "https://dashboard-info.pages.dev/api/info"
+    : "/api/info";
+
   try {
-    const res = await fetch("/api/info");
+    const res = await fetch(apiUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     state.data.network = json;
