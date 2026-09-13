@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fingerprint Inspector</title>
+  <link rel="stylesheet" href="css/info_css.css">
+</head>
+<body>
+  <header>
+    <h1>Datos filtrados por el Navegador</h1>
+    <p>Esta página recoge lo que tu navegador y conexión exponen de forma pasiva.</p>
+  </header>
+
+  <main>
+    <section id="controls">
+      <button id="scanBtn">Ejecutar análisis</button>
+      <button id="copyBtn" disabled>Copiar JSON</button>
+      <p id="status">Listo para escanear.</p>
+    </section>
+
+    <section id="network-section" class="card hidden">
+      <h2>🌐 Red (Cloudflare)</h2>
+      <div id="network-data" class="data-grid"></div>
+    </section>
+
+    <section id="basic-section" class="card hidden">
+      <h2>💻 Navegador y Sistema</h2>
+      <div id="basic-data" class="data-grid"></div>
+    </section>
+
+    <section id="canvas-section" class="card hidden">
+      <h2>🎨 Canvas Fingerprint</h2>
+      <div id="canvas-data" class="data-grid"></div>
+    </section>
+
+    <section id="webgl-section" class="card hidden">
+      <h2>🖥️ WebGL / GPU</h2>
+      <div id="webgl-data" class="data-grid"></div>
+    </section>
+
+    <section id="audio-section" class="card hidden">
+      <h2>🔊 Audio Fingerprint</h2>
+      <div id="audio-data" class="data-grid"></div>
+    </section>
+
+    <section id="fonts-section" class="card hidden">
+      <h2>🔤 Fuentes detectadas</h2>
+      <div id="fonts-data" class="data-grid"></div>
+    </section>
+
+    <section id="raw-section" class="card hidden">
+      <h2>📦 Datos completos (JSON)</h2>
+      <pre id="raw-json"></pre>
+    </section>
+  </main>
+
+  <script src="js/info_js.js"></script>
+</body>
+</html>
