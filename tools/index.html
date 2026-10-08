@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Renombrador de archivos PDF</title>
+
+        <link rel="stylesheet" href="css/estilo.css">
+
+        <!-- Librería JSZip para generar el archivo ZIP -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"> </script>
+    </head>
+
+    <body>
+
+        <div class="contenedor">
+
+            <!-- ENCABEZADO -->
+
+            <div class="encabezado">
+
+                <h1> Renombrador de archivos PDF </h1>
+
+                <p> Seleccione los archivos PDF que desea validar y renombrar. </p>
+
+            </div>
+
+            <!-- INFORMACIÓN DEL FORMATO -->
+
+            <div class="panel formato">
+
+                <div class="titulo-panel"> Formato de archivo </div>
+
+                <div class="ejemplo">
+
+                    <div class="ejemplo-titulo"> Nombre original: </div>
+
+                    <div class="nombre-ejemplo"> 4155 96 LAB.PABLOCASSARA_S.R.L.-HABILITACION-PM.pdf </div>
+
+                </div>
+
+                <div class="flecha"> ↓ </div>
+
+                <div class="ejemplo">
+
+                    <div class="ejemplo-titulo"> Nombre resultante: </div>
+
+                    <div class="nombre-ejemplo resultado"> 4155 96 LAB. PABLO CASSARA S.R.L. - HABILITACION - PM.pdf
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SELECCIÓN DE ARCHIVOS -->
+
+            <div class="panel">
+
+                <label for="archivos" class="zona-seleccion">
+
+                    <div class="icono"> 📄 </div>
+
+                    <div class="texto-seleccion"> Seleccionar archivos PDF </div>
+
+                    <div class="ayuda"> Puede seleccionar uno o varios archivos </div>
+
+                </label>
+
+                <input type="file" id="archivos" accept=".pdf,application/pdf" multiple>
+
+            </div>
+
+            <!-- BOTONES -->
+
+            <div class="botones">
+
+                <button type="button" id="btnProcesar" disabled> Procesar archivos </button>
+
+                <button type="button" id="btnLimpiar" class="boton-secundario"> Limpiar </button>
+
+            </div>
+
+            <!-- RESUMEN -->
+
+            <div id="resumen" class="resumen oculto">
+
+                <div class="estadistica valido">
+
+                    <div id="cantidadValidos" class="numero"> 0 </div>
+
+                    <div class="descripcion"> Archivos válidos </div>
+
+                </div>
+
+                <div class="estadistica invalido">
+
+                    <div id="cantidadInvalidos" class="numero"> 0 </div>
+
+                    <div class="descripcion"> Archivos no válidos </div>
+
+                </div>
+
+            </div>
+
+            <!-- LISTA DE ARCHIVOS -->
+
+            <div class="panel resultados">
+
+                <div class="titulo-panel"> Archivos seleccionados </div>
+
+                <div id="listaArchivos" class="lista-archivos">
+
+                    <div class="sin-archivos"> No se seleccionaron archivos. </div>
+
+                </div>
+
+            </div>
+
+            <!-- DESCARGA -->
+
+            <button type="button" id="btnDescargar" class="boton-descargar" disabled> Descargar archivos renombrados en
+                ZIP </button>
+
+            <!-- MENSAJE -->
+
+            <div id="mensaje" class="mensaje oculto"> </div>
+
+            <!-- PIE -->
+
+            <div class="pie">
+
+                <p> Los archivos se procesan localmente en su navegador. </p>
+
+                <p> Ningún PDF es enviado a Internet. </p>
+
+            </div>
+
+        </div>
+
+        <!-- JAVASCRIPT -->
+
+        <script src="js/app.js"></script>
+
+    </body>
+
+</html>

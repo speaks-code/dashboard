@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Extractor comparador</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="css/check_disp.css">
+    </head>
+
+    <body>
+
+        <header class="cabecera">
+            <div class="contenedor fila-top apilada">
+                <div class="row_rotulo">
+                    <div class="rotulo">Herramienta de auditoría · Prefijos numéricos de archivos PDF</div>
+                    <h1>¿Qué números <em>encabezan</em> los PDF?</h1>
+                </div>
+                <div class="row_entradilla">
+                    <p class="entradilla">
+                        Elige la carpeta raíz —o arrastra archivos y carpetas— y extraeré de cada nombre de PDF los
+                        primeros 4 caracteres, siempre que sean dígitos, para construir una lista ordenada y auditar
+                        la serie: números extraídos, duplicados y huecos detectados.
+                    </p>
+                    <div class="formula">
+                        <b>^\d{4}…</b>
+                        <span>Extrae los primeros 4 caracteres si son números.</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="contenedor">
+
+            <!-- 01 · ARCHIVOS -->
+            <section class="bloque">
+                <div class="sec-head">
+                    <span class="num">01</span>
+                    <h2>Archivos</h2><span class="regla"></span>
+                </div>
+
+                <div class="dropzone" id="zona" tabindex="0" role="button"
+                    aria-label="Elegir carpeta raíz o soltar archivos PDF">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                    </svg>
+                    <b>Arrastra aquí la carpeta raíz</b>
+                    <span>o haz clic para elegirla · se escanean todas las subcarpetas</span>
+                    <span><a href="#" id="link-archivos">prefiero seleccionar archivos sueltos</a></span>
+                </div>
+
+                <input type="file" id="carpeta" webkitdirectory multiple hidden>
+                <input type="file" id="archivos" accept=".pdf,application/pdf" multiple hidden>
+
+                <div class="pie-entrada">
+                    <span id="contador" aria-live="polite">—</span>
+                    <span class="err" id="err" hidden></span>
+                    <div class="acciones">
+                        <button class="btn" id="btn-limpiar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round">
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                            Limpiar
+                        </button>
+                        <button class="btn primario" id="btn-extraer">
+                            Extraer prefijos <kbd>Ctrl ↵</kbd>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 02 · DIAGNÓSTICO -->
+            <section class="bloque oculto" id="sec-diag">
+                <div class="sec-head">
+                    <span class="num">02</span>
+                    <h2>Diagnóstico</h2><span class="regla"></span>
+                </div>
+                <div class="ficha-wrap">
+                    <div class="sello" id="sello">
+                        <b id="sello-txt">Sin datos</b>
+                        <small id="sello-sub"></small>
+                    </div>
+                    <div class="ficha">
+                        <div class="fila"><span class="k">Archivos PDF seleccionados</span><span
+                                class="puntos"></span><span class="v" id="v-total">0</span></div>
+                        <div class="fila"><span class="k">Rango numérico de la serie</span><span
+                                class="puntos"></span><span class="v" id="v-rango">—</span></div>
+                        <div class="fila"><span class="k">Números en la lista</span><span class="puntos"></span><span
+                                class="v" id="v-lista">0</span></div>
+                        <div class="fila"><span class="k">Números distintos</span><span class="puntos"></span><span
+                                class="v" id="v-distintos">0</span></div>
+                        <div class="fila"><span class="k">Prefijos repetidos (×2 o más)</span><span
+                                class="puntos"></span><span class="v" id="v-repetidos">0</span></div>
+                        <div class="fila destacada"><span class="k">Números faltantes en la serie</span><span
+                                class="puntos"></span><span class="v" id="v-faltantes">0</span></div>
+                        <div class="fila"><span class="k">Descartados sin prefijo</span><span
+                                class="puntos"></span><span class="v" id="v-desc">0</span></div>
+                    </div>
+                    <div class="completitud" id="bloque-pct">
+                        <div class="cab"><span>Tasa de extracción</span><b id="v-pct">0%</b></div>
+                        <div class="barra"><i id="barra-fill"></i></div>
+                    </div>
+                    <div class="dupes oculto" id="descartes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                            <path d="M12 9v4M12 17h.01" />
+                        </svg>
+                        <span id="descartes-txt"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 03 · LISTA EXTRAÍDA -->
+            <section class="bloque">
+                <div class="sec-head">
+                    <span class="num">03</span>
+                    <h2>Números extraídos</h2><span class="regla"></span>
+                    <div class="herr-falt oculto" id="herr-lista">
+                        <div class="segmento" role="group" aria-label="Modo de vista de la lista">
+                            <button id="lista-compacto" aria-pressed="true">Compacta</button>
+                            <button id="lista-detallado" aria-pressed="false">Detallada</button>
+                        </div>
+                        <button class="btn mini" id="btn-copiar-lista">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="12" height="12" rx="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copiar
+                        </button>
+                        <button class="btn mini" id="btn-descargar-lista">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                            </svg>
+                            .txt
+                        </button>
+                    </div>
+                </div>
+                <div id="salida-lista">
+                    <div class="vacio">
+                        <span class="grande">Sin extracción todavía</span>
+                        Selecciona la carpeta raíz en la sección 01 y los prefijos aparecerán aquí.
+                    </div>
+                </div>
+            </section>
+
+            <!-- 04 · FALTANTES -->
+            <section class="bloque">
+                <div class="sec-head">
+                    <span class="num">04</span>
+                    <h2>Números faltantes</h2><span class="regla"></span>
+                    <div class="herr-falt oculto" id="herr-falt">
+                        <div class="segmento" role="group" aria-label="Modo de vista de faltantes">
+                            <button id="falt-compacto" aria-pressed="true">Compacta</button>
+                            <button id="falt-detallado" aria-pressed="false">Detallada</button>
+                        </div>
+                        <button class="btn mini" id="btn-copiar-falt">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="12" height="12" rx="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copiar
+                        </button>
+                        <button class="btn mini" id="btn-descargar-falt">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                            </svg>
+                            .txt
+                        </button>
+                    </div>
+                </div>
+                <div id="salida-falt">
+                    <div class="vacio">
+                        <span class="grande">Sin análisis todavía</span>
+                        Extrae los prefijos para detectar los huecos de la serie.
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="contenedor">
+            <span>EXTRACTOR DE PREFIJOS · todo el procesamiento ocurre en tu navegador, ningún archivo se sube a ningún
+                servidor.</span>
+            <span>Ctrl + ↵ para extraer</span>
+        </footer>
+
+        <div id="toast" role="status"></div>
+
+        <script src="js/new_check.js"></script>
+
+    </body>
+
+</html>
