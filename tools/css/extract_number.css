@@ -1,0 +1,89 @@
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  border: 1.5px dashed currentColor;
+  border-radius: 10px;
+  opacity: .7;
+  padding: 2.4rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity .2s ease, background .2s ease, transform .2s ease;
+}
+
+.dropzone:hover,
+.dropzone.encima {
+  opacity: 1;
+  background: rgba(128, 128, 128, .08);
+}
+
+.dropzone.encima {
+  transform: scale(1.01);
+}
+
+.dropzone.llena {
+  border-style: solid;
+  opacity: 1;
+}
+
+.dropzone svg {
+  width: 34px;
+  height: 34px;
+  margin-bottom: .3rem;
+}
+
+.dropzone b {
+  font-size: 1.05rem;
+}
+
+.dropzone span {
+  font-size: .85rem;
+  opacity: .75;
+}
+
+@keyframes tiembla {
+  20% {
+    transform: translateX(-5px);
+  }
+
+  40% {
+    transform: translateX(5px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.dropzone.error {
+  animation: tiembla .4s ease;
+}
+
+/* Filas del modo detallado: número + nombre de archivo de origen */
+.chip.det {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: .7em;
+  width: 100%;
+  text-align: left;
+}
+
+.chip.det b {
+  flex: 0 0 auto;
+}
+
+.chip.det .nom {
+  flex: 1 1 auto;
+  min-width: 0;
+  opacity: .65;
+  font-size: .85em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
