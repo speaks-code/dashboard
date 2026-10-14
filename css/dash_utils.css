@@ -1,0 +1,252 @@
+:root {
+  --papel: #f4f1ea;
+  --tinta: #1a1a1a;
+  --tinta-62: rgba(26, 26, 26, .62);
+  --linea: rgba(26, 26, 26, .18);
+  --linea-fuerte: rgba(26, 26, 26, .4);
+  --verde: #2f5d3a;
+  --rojo: #8b2e2e;
+  --serif: 'Instrument Serif', serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --ancho-max: 1080px;
+  /* ← Ancho unificado */
+  --padding-lateral: 28px;
+  /* ← Padding unificado */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0
+}
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--mono);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column
+}
+
+/* Contenedor unificado — mismo ancho que los módulos originales */
+.contenedor {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 var(--padding-lateral);
+  width: 100%;
+}
+
+header.cabecera {
+  padding: 52px 0 34px;
+  border-bottom: 3px double var(--linea-fuerte);
+  background: linear-gradient(to bottom, var(--papel), rgba(236, 230, 214, .5));
+}
+
+.rotulo {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--tinta-62);
+  margin-bottom: 14px
+}
+
+header h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1.05;
+  letter-spacing: -.01em
+}
+
+header h1 em {
+  font-style: italic;
+  color: var(--verde)
+}
+
+.entradilla {
+  margin-top: 18px;
+  font-size: 13.5px;
+  max-width: 62ch;
+  color: var(--tinta-62);
+  line-height: 1.7
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(47, 93, 58, .08);
+  color: var(--verde);
+  border: 1px solid rgba(47, 93, 58, .3);
+  padding: 6px 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 22px;
+}
+
+section {
+  padding: 40px 0;
+  border-bottom: 1px solid var(--linea)
+}
+
+section:last-of-type {
+  border-bottom: none
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px
+}
+
+.titulo h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 26px;
+  white-space: nowrap
+}
+
+.titulo .linea {
+  flex: 1;
+  height: 1px;
+  background: var(--linea)
+}
+
+/* Grid ajustado al ancho unificado */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.tarjeta {
+  background: var(--papel);
+  border: 1.5px solid var(--linea-fuerte);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: .2s cubic-bezier(.25, .46, .45, .94);
+}
+
+.tarjeta:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 0 rgba(26, 26, 26, .15);
+  border-color: var(--tinta);
+}
+
+.tarjeta .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px
+}
+
+.tarjeta svg.icono {
+  width: 34px;
+  height: 34px;
+  stroke: var(--tinta);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid var(--linea);
+  color: var(--tinta-62);
+}
+
+.tarjeta h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 21px;
+  margin-bottom: 10px
+}
+
+.tarjeta p {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--tinta-62);
+  flex: 1;
+  margin-bottom: 20px
+}
+
+.accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rojo);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.accion svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  transition: .2s
+}
+
+.tarjeta:hover .accion svg {
+  transform: translateX(6px)
+}
+
+footer {
+  margin-top: auto;
+  border-top: 3px double var(--linea-fuerte);
+  padding: 22px 0;
+  font-size: 11px;
+  color: var(--tinta-62);
+  letter-spacing: .05em;
+}
+
+footer .contenedor {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px
+}
+
+@media(max-width:768px) {
+  :root {
+    --padding-lateral: 20px
+  }
+
+  header h1 {
+    font-size: 34px
+  }
+
+  header.cabecera {
+    padding: 36px 0 26px
+  }
+
+  .grid {
+    grid-template-columns: 1fr
+  }
+
+  .titulo h2 {
+    font-size: 20px;
+    white-space: normal
+  }
+
+  section {
+    padding: 32px 0
+  }
+}
