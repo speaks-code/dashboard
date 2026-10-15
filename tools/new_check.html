@@ -1,44 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Evaluador de secuencia numerica.</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-            rel="stylesheet">
-        <link rel="stylesheet" href="css/check_disp.css">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Panel de Herramientas Estatales</title>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" />
+        <!-- StyleSheet -->
+        <link rel="stylesheet" href="css/check_disp.css" />
     </head>
 
-    <body>
+<body>
+<header class="cabecera">
 
-        <header class="cabecera">
-            <div class="contenedor fila-top apilada">
-                <div class="row_rotulo">
-                    <div class="rotulo">Herramienta de auditoría · Prefijos numéricos de archivos PDF</div>
-                    <h1>¿Qué números <em>encabezan</em> los PDF?</h1>
-                </div>
-                <div class="row_entradilla">
-                    <p class="entradilla">
-                        Selecciona la carpeta raíz —o arrastra archivos y carpetas— Se extraeran los primeros 4 caracteres siempre que sean dígitos. Se construira una lista ordenada, auditando la serie: números extraídos, duplicados y huecos detectados.
-                    </p>
-                    <div class="formula">
-                        <b>^\d{4}…</b>
-                        <span>Extrae los primeros 4 caracteres si son números.</span>
-                    </div>
-                </div>
+    <div class="contenedor fila-top apilada">
+        <div class="row_rotulo">
+            <div class="rotulo">
+                Herramienta de auditoría · Prefijos numéricos de archivos PDF
             </div>
-        </header>
+            <h1>¿Qué números <em>encabezan</em> tus PDF?</h1>
+        </div>
+
+        <div class="row_entradilla">
+            <p class="entradilla">
+                Selecciona la carpeta raíz —o arrastra archivos y carpetas— Se extraeran los primeros 4 caracteres siempre que sean dígitos. Se
+                construira una lista ordenada, auditando la serie: números extraídos, duplicados y huecos detectados.
+            </p>
+
+            <div class="badge">
+                <b>^\d{4}…</b> -
+                <span>Extrae los primeros 4 caracteres si son números.</span>
+            </div>
+        </div>
+
+    </div>
+
+</header>
 
         <main class="contenedor">
-
             <!-- 01 · ARCHIVOS -->
             <section class="bloque">
                 <div class="sec-head">
                     <span class="num">01</span>
-                    <h2>Archivos</h2><span class="regla"></span>
+                    <h2>Archivos</h2>
+                    <span class="regla"></span>
                 </div>
 
                 <div class="dropzone" id="zona" tabindex="0" role="button"
@@ -53,8 +59,8 @@
                     <span><a href="#" id="link-archivos">prefiero seleccionar archivos sueltos</a></span>
                 </div>
 
-                <input type="file" id="carpeta" webkitdirectory multiple hidden>
-                <input type="file" id="archivos" accept=".pdf,application/pdf" multiple hidden>
+                <input type="file" id="carpeta" webkitdirectory multiple hidden />
+                <input type="file" id="archivos" accept=".pdf,application/pdf" multiple hidden />
 
                 <div class="pie-entrada">
                     <span id="contador" aria-live="polite">—</span>
@@ -78,7 +84,8 @@
             <section class="bloque oculto" id="sec-diag">
                 <div class="sec-head">
                     <span class="num">02</span>
-                    <h2>Diagnóstico</h2><span class="regla"></span>
+                    <h2>Diagnóstico</h2>
+                    <span class="regla"></span>
                 </div>
                 <div class="ficha-wrap">
                     <div class="sello" id="sello">
@@ -86,23 +93,39 @@
                         <small id="sello-sub"></small>
                     </div>
                     <div class="ficha">
-                        <div class="fila"><span class="k">Archivos PDF seleccionados</span><span
-                                class="puntos"></span><span class="v" id="v-total">0</span></div>
-                        <div class="fila"><span class="k">Rango numérico de la serie</span><span
-                                class="puntos"></span><span class="v" id="v-rango">—</span></div>
-                        <div class="fila"><span class="k">Números en la lista</span><span class="puntos"></span><span
-                                class="v" id="v-lista">0</span></div>
-                        <div class="fila"><span class="k">Números distintos</span><span class="puntos"></span><span
-                                class="v" id="v-distintos">0</span></div>
-                        <div class="fila"><span class="k">Prefijos repetidos (×2 o más)</span><span
-                                class="puntos"></span><span class="v" id="v-repetidos">0</span></div>
-                        <div class="fila destacada"><span class="k">Números faltantes en la serie</span><span
-                                class="puntos"></span><span class="v" id="v-faltantes">0</span></div>
-                        <div class="fila"><span class="k">Descartados sin prefijo</span><span
-                                class="puntos"></span><span class="v" id="v-desc">0</span></div>
+                        <div class="fila">
+                            <span class="k">Archivos PDF seleccionados</span><span class="puntos"></span><span class="v"
+                                id="v-total">0</span>
+                        </div>
+                        <div class="fila">
+                            <span class="k">Rango numérico de la serie</span><span class="puntos"></span><span class="v"
+                                id="v-rango">—</span>
+                        </div>
+                        <div class="fila">
+                            <span class="k">Números en la lista</span><span class="puntos"></span><span class="v"
+                                id="v-lista">0</span>
+                        </div>
+                        <div class="fila">
+                            <span class="k">Números distintos</span><span class="puntos"></span><span class="v"
+                                id="v-distintos">0</span>
+                        </div>
+                        <div class="fila">
+                            <span class="k">Prefijos repetidos (×2 o más)</span><span class="puntos"></span><span
+                                class="v" id="v-repetidos">0</span>
+                        </div>
+                        <div class="fila destacada">
+                            <span class="k">Números faltantes en la serie</span><span class="puntos"></span><span
+                                class="v" id="v-faltantes">0</span>
+                        </div>
+                        <div class="fila">
+                            <span class="k">Descartados sin prefijo</span><span class="puntos"></span><span class="v"
+                                id="v-desc">0</span>
+                        </div>
                     </div>
                     <div class="completitud" id="bloque-pct">
-                        <div class="cab"><span>Tasa de extracción</span><b id="v-pct">0%</b></div>
+                        <div class="cab">
+                            <span>Tasa de extracción</span><b id="v-pct">0%</b>
+                        </div>
                         <div class="barra"><i id="barra-fill"></i></div>
                     </div>
                     <div class="dupes oculto" id="descartes">
@@ -120,11 +143,14 @@
             <section class="bloque">
                 <div class="sec-head">
                     <span class="num">03</span>
-                    <h2>Números extraídos</h2><span class="regla"></span>
+                    <h2>Números extraídos</h2>
+                    <span class="regla"></span>
                     <div class="herr-falt oculto" id="herr-lista">
                         <div class="segmento" role="group" aria-label="Modo de vista de la lista">
                             <button id="lista-compacto" aria-pressed="true">Compacta</button>
-                            <button id="lista-detallado" aria-pressed="false">Detallada</button>
+                            <button id="lista-detallado" aria-pressed="false">
+                                Detallada
+                            </button>
                         </div>
                         <button class="btn mini" id="btn-copiar-lista">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -146,7 +172,8 @@
                 <div id="salida-lista">
                     <div class="vacio">
                         <span class="grande">Sin extracción todavía</span>
-                        Selecciona la carpeta raíz en la sección 01 y los prefijos aparecerán aquí.
+                        Selecciona la carpeta raíz en la sección 01 y los prefijos
+                        aparecerán aquí.
                     </div>
                 </div>
             </section>
@@ -155,11 +182,14 @@
             <section class="bloque">
                 <div class="sec-head">
                     <span class="num">04</span>
-                    <h2>Números faltantes</h2><span class="regla"></span>
+                    <h2>Números faltantes</h2>
+                    <span class="regla"></span>
                     <div class="herr-falt oculto" id="herr-falt">
                         <div class="segmento" role="group" aria-label="Modo de vista de faltantes">
                             <button id="falt-compacto" aria-pressed="true">Compacta</button>
-                            <button id="falt-detallado" aria-pressed="false">Detallada</button>
+                            <button id="falt-detallado" aria-pressed="false">
+                                Detallada
+                            </button>
                         </div>
                         <button class="btn mini" id="btn-copiar-falt">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -185,19 +215,17 @@
                     </div>
                 </div>
             </section>
-
         </main>
 
         <footer class="contenedor">
-            <span>EXTRACTOR DE PREFIJOS · todo el procesamiento ocurre en tu navegador, ningún archivo se sube a ningún
-                servidor.</span>
+            <span>EXTRACTOR DE PREFIJOS · todo el procesamiento ocurre en tu navegador,
+                ningún archivo se sube a ningún servidor.</span>
             <span>Ctrl + ↵ para extraer</span>
         </footer>
 
         <div id="toast" role="status"></div>
 
         <script src="js/new_check.js"></script>
-
     </body>
-<!-- Proyecto bajo licencia. hjn -->
+<!-- Aplicacion bajo licencia -->
 </html>
