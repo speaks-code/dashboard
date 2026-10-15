@@ -13,7 +13,7 @@
    08 · Responsive
    09 · Extractor de PDF (solo pdf_check.html)
    ========================================================================== */
-
+/* Stylo bajo licencia. hjn */
 /* ---------- 00 · Variables y base ---------- */
 
 :root {
@@ -50,7 +50,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Grano de papel, muy sutil */
 body::before {
     content: "";
     position: fixed;
@@ -85,7 +84,6 @@ footer {
     border-bottom: 3px double var(--linea-fuerte);
 }
 
-/* Variante por defecto: texto a la izquierda, fórmula a la derecha */
 .cabecera .fila-top {
     display: flex;
     justify-content: space-between;
@@ -94,17 +92,12 @@ footer {
     flex-wrap: wrap;
 }
 
-/* Variante apilada (pdf_check.html): el título ocupa una fila propia a ancho
-   completo y entradilla + fórmula comparten la fila inferior. Así el largo
-   del <h1> no empuja la fórmula hacia abajo. */
 .cabecera .fila-top.apilada {
     flex-direction: column;
     align-items: stretch;
     gap: 18px;
 }
 
-/* Fila inferior del modo apilado: párrafo a la izquierda,
-   fórmula anclada arriba a la derecha */
 .row_entradilla {
     display: flex;
     align-items: flex-start;
@@ -114,39 +107,28 @@ footer {
 
 .row_entradilla .entradilla {
     margin: 0;
-    /* la 1ª línea del párrafo queda a la altura de la fórmula */
     flex: 1 1 auto;
     min-width: 0;
 }
 
 .row_entradilla .formula {
     flex: 0 0 auto;
-    /* no se comprime ni salta de línea */
     margin-left: auto;
 }
 
 .rotulo {
-    font-size: 11px;
-    letter-spacing: .28em;
-    text-transform: uppercase;
-    color: var(--tinta-62);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.rotulo::before {
-    content: "";
-    width: 34px;
-    height: 1px;
-    background: var(--tinta);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--tinta-62);
+  margin-bottom: 14px
 }
 
 h1 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(42px, 6vw, 72px);
+    font-size: 42px;
     line-height: 1.02;
     letter-spacing: -.01em;
 }
@@ -184,6 +166,21 @@ h1 em {
     font-size: 10.5px;
     color: var(--tinta-62);
     letter-spacing: .08em;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(47, 93, 58, .08);
+  color: var(--verde);
+  border: 1px solid rgba(47, 93, 58, .3);
+  padding: 6px 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 22px;
 }
 
 /* ---------- 02 · Secciones ---------- */
