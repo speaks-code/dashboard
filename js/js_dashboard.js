@@ -266,7 +266,52 @@ function updateChartHeader(s) {
   chg.className = "chart-change " + cls;
 }
 
-// ── GRÁFICO CORREGIDO ───────────────────────────────────────────────────────
+// ── GRÁFICO ───────────────────────────────────────────────────────
+function updatePeriodPerformance(
+  symbol,
+  timeframe,
+  first,
+  last,
+  change,
+  percentChange,
+) {
+  const container = document.getElementById("rendimiento");
+  if (!container) return;
+
+  const isPositive = percentChange >= 0;
+  const sign = isPositive ? "+" : "";
+  const arrow = isPositive ? "▲" : "▼";
+  const colorClass = isPositive ? "up" : "down";
+
+  const periodLabels = {
+    "1D": "1 Día",
+    "1W": "1 Semana",
+    "1M": "1 Mes",
+    "3M": "3 Meses",
+    "6M": "6 Meses",
+    "1Y": "1 Año",
+    MAX: "Máximo Histórico",
+  };
+  const label = periodLabels[timeframe] || timeframe;
+
+  // Se usan IDs únicos (chartPeriodPrice) para evitar duplicar IDs en el HTML,
+  // lo que causaría que se sobrescriba el precio principal del encabezado.
+  container.innerHTML = `
+    <div class="chart-header" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e1e4e8;">
+      <div class="chart-title-group">
+        <span class="chart-symbol">${symbol}</span>
+        <span class="chart-name">Rendimiento (${label})</span>
+        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"}; font-weight: bold; font-size: 1.1em;">
+          ${sign}${percentChange.toFixed(2)}%
+        </span>
+        <span class="chart-change ${colorClass}" id="chartPeriodChange">
+          ${arrow} ${sign}$${Math.abs(change).toFixed(2)}
+        </span>
+      </div>
+    </div>
+  `;
+}
+
 async function loadChart(symbol, timeframe) {
   currentSymbol = symbol;
   currentTimeframe = timeframe;
@@ -316,6 +361,22 @@ async function loadChart(symbol, timeframe) {
     const last = points[points.length - 1];
     const first = points[0];
     const change = last.price - first.price;
+
+    // Cálculo del porcentaje de rendimiento del período ──
+    const percentChange = ((last.price - first.price) / first.price) * 100;
+    updatePeriodPerformance(
+      symbol,
+      timeframe,
+      first,
+      last,
+      change,
+      percentChange,
+    );
+    // ──────────────────────────────────────────────────────────────
+
+    const canvas = $("mainChart");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
 
     const canvas = $("mainChart");
     if (!canvas) return;
