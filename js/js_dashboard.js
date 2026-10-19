@@ -291,11 +291,11 @@ function updatePeriodPerformance(
   const label = periodLabels[timeframe] || timeframe;
 
   container.innerHTML = `
-    <div class="chart-header" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e1e4e8;">
+    <div class="chart-header">
       <div class="chart-title-group">
         <span class="chart-symbol">${symbol}</span>
         <span class="chart-name">Rendimiento (${label})</span>
-        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"}; font-weight: bold; font-size: 1.1em;">
+        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"};">
           ${sign}${percentChange.toFixed(2)}%
         </span>
         <span class="chart-change ${colorClass}" id="chartPeriodChange">
