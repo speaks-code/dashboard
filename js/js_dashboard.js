@@ -158,15 +158,11 @@ function renderGrid() {
     const arrow = s.changePercent >= 0 ? "▲" : "▼";
 
     card.innerHTML = `
-      <div class="stock-top-row">
-        <div class="stock-symbol">${s.symbol}</div>
-        <div class="stock-price">$${s.price.toFixed(2)}</div>
-      </div>
-      <div class="stock-name">${s.name}</div>
-      <div class="stock-change ${cls}">
-        <span>${arrow}</span> ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)
-      </div>
-    `;
+<div class="stock-symbol">${s.symbol}</div>
+<div class="stock-price">$${s.price.toFixed(2)}</div>
+<div class="stock-name">${s.name}</div>
+<div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
+ `;
     row.appendChild(card);
   });
 }
@@ -266,7 +262,7 @@ function updateChartHeader(s) {
   chg.className = "chart-change " + cls;
 }
 
-// ── GRÁFICO ───────────────────────────────────────────────────────
+// ── Función para mostrar el rendimiento del período seleccionado ──
 function updatePeriodPerformance(
   symbol,
   timeframe,
@@ -294,8 +290,6 @@ function updatePeriodPerformance(
   };
   const label = periodLabels[timeframe] || timeframe;
 
-  // Se usan IDs únicos (chartPeriodPrice) para evitar duplicar IDs en el HTML,
-  // lo que causaría que se sobrescriba el precio principal del encabezado.
   container.innerHTML = `
     <div class="chart-header" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e1e4e8;">
       <div class="chart-title-group">
@@ -312,6 +306,7 @@ function updatePeriodPerformance(
   `;
 }
 
+// ── GRÁFICO ───────────────────────────────────────────────────────
 async function loadChart(symbol, timeframe) {
   currentSymbol = symbol;
   currentTimeframe = timeframe;
@@ -324,7 +319,6 @@ async function loadChart(symbol, timeframe) {
   if (s) updateChartHeader(s);
 
   try {
-    // La petición sigue siendo simple, el Worker ahora hace todo el trabajo pesado
     const hist = await fetchAPI(
       "/api/history?symbol=" +
         encodeURIComponent(symbol) +
@@ -338,6 +332,10 @@ async function loadChart(symbol, timeframe) {
         chartInstance.destroy();
         chartInstance = null;
       }
+      const container = document.getElementById("rendimiento");
+      if (container)
+        container.innerHTML =
+          '<p style="color:#666; text-align:center; padding: 10px;">Sin datos históricos para este período.</p>';
       return;
     }
 
@@ -362,7 +360,7 @@ async function loadChart(symbol, timeframe) {
     const first = points[0];
     const change = last.price - first.price;
 
-    // Cálculo del porcentaje de rendimiento del período ──
+    // ── NUEVO: Cálculo del porcentaje de rendimiento del período ──
     const percentChange = ((last.price - first.price) / first.price) * 100;
     updatePeriodPerformance(
       symbol,
@@ -373,10 +371,6 @@ async function loadChart(symbol, timeframe) {
       percentChange,
     );
     // ──────────────────────────────────────────────────────────────
-
-    const canvas = $("mainChart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
 
     const canvas = $("mainChart");
     if (!canvas) return;
@@ -404,7 +398,7 @@ async function loadChart(symbol, timeframe) {
             borderWidth: 2,
             fill: true,
             tension: 0.1,
-            pointRadius: points.length < 50 ? 2 : 0, // Ajuste: oculta puntos si hay muchos para mejor rendimiento
+            pointRadius: points.length < 50 ? 2 : 0,
             pointHoverRadius: 4,
           },
         ],
@@ -448,6 +442,10 @@ async function loadChart(symbol, timeframe) {
     });
   } catch (e) {
     console.error("Error cargando gráfico", e);
+    const container = document.getElementById("rendimiento");
+    if (container)
+      container.innerHTML =
+        '<p style="color:#cf222e; text-align:center; padding: 10px;">Error al cargar el rendimiento.</p>';
   }
 }
 
