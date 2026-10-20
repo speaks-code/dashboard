@@ -3,7 +3,7 @@
   --bg-card: #ffffff;
   --border: #e1e4e8;
   --border-hover: #0969da;
-  --text-primary: #0d1b2a;
+  --text-primary: #25252c;
   --text-secondary: #5f6b7a;
   --text-muted: #8c959f;
   --positive: #1a7f37;
@@ -11,6 +11,8 @@
   --danger: #cf222e;
   --danger-bg: #ffebe9;
   --accent: #0969da;
+  --btnText-refresh: #4B42FF;
+  --btnText-gray: #25252c;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --serif: 'Instrument Serif', serif;
   --mono: 'IBM Plex Mono', monospace;
@@ -58,6 +60,7 @@ body {
 }
 
 .btn-refresh {
+  font-family: var(--mono);
   padding: 8px 18px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -81,6 +84,11 @@ body {
 .btn-refresh:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btnText {
+  font-family: var(--mono);
+  color: var(--btnText-gray);
 }
 
 .spin {
@@ -127,7 +135,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
+  padding: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
@@ -143,6 +151,13 @@ body {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
 }
+
+.stock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 
 .stock-symbol {
   font-size: 13px;
@@ -161,10 +176,9 @@ body {
 }
 
 .stock-price {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-top: 10px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -176,6 +190,7 @@ body {
   align-items: center;
   gap: 4px;
   font-variant-numeric: tabular-nums;
+  background-color: #fafcff;
 }
 
 .stock-change.up {
