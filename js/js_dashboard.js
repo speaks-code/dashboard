@@ -158,8 +158,10 @@ function renderGrid() {
     const arrow = s.changePercent >= 0 ? "▲" : "▼";
 
     card.innerHTML = `
+    <div class="stock-row" id="stock-row">
 <div class="stock-symbol">${s.symbol}</div>
 <div class="stock-price">$${s.price.toFixed(2)}</div>
+</div>
 <div class="stock-name">${s.name}</div>
 <div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
  `;
