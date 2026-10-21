@@ -1,3 +1,11 @@
+/* =====================================================
+   NASDAQ Dashboard v2
+   - Tema claro/oscuro persistente + gráfico adaptado
+   - Nombres de empresas estáticos (sin parpadeo)
+   - Hora real del Este de EE.UU. (America/New_York)
+   - Actualización de tarjetas sin re-render completo
+   ===================================================== */
+
 const PROXY = "https://dashboard.despachodigitalizacion.workers.dev";
 const SYMBOLS = [
   "AAPL",
@@ -17,14 +25,82 @@ const SYMBOLS = [
   "INTC",
 ];
 
+// Nombres oficiales: nunca cambian, se muestran al instante
+const NAMES = {
+  AAPL: "Apple Inc.",
+  MSFT: "Microsoft Corp.",
+  NVDA: "NVIDIA Corp.",
+  AMZN: "Amazon.com Inc.",
+  GOOGL: "Alphabet Inc.",
+  META: "Meta Platforms Inc.",
+  TSLA: "Tesla Inc.",
+  AVGO: "Broadcom Inc.",
+  COST: "Costco Wholesale Corp.",
+  NFLX: "Netflix Inc.",
+  AMD: "Advanced Micro Devices",
+  PLTR: "Palantir Technologies",
+  MU: "Micron Technology",
+  CSCO: "Cisco Systems Inc.",
+  INTC: "Intel Corp.",
+};
+
+const THEME_KEY = "nasdaq-theme";
+
 let stockData = [];
 let currentSymbol = "AAPL";
 let currentTimeframe = "1M";
 let chartInstance = null;
+let lastSeries = null; // datos del último gráfico, para re-render sin refetch
+const cards = new Map();
 
 function $(id) {
   return document.getElementById(id);
 }
+
+/* ---------- Tema ---------- */
+
+function themeColors() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  return {
+    grid: dark ? "rgba(48, 54, 61, 0.55)" : "rgba(208, 215, 222, 0.55)",
+    tick: dark ? "#9198a1" : "#59636e",
+    tooltipBg: dark ? "rgba(22, 27, 34, 0.95)" : "rgba(31, 35, 40, 0.92)",
+    tooltipBorder: dark ? "#30363d" : "#d0d7de",
+    transparent: "rgba(0, 0, 0, 0)",
+  };
+}
+
+function applyTheme(theme, save) {
+  document.documentElement.dataset.theme = theme;
+  const toggle = $("themeToggle");
+  if (toggle) toggle.setAttribute("aria-checked", String(theme === "dark"));
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta)
+    meta.setAttribute("content", theme === "dark" ? "#0d1117" : "#f6f8fa");
+  if (save) {
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {}
+  }
+  // Redibuja el gráfico con los colores del tema, sin volver a pedir datos ni animar
+  if (lastSeries) buildChart(false);
+}
+
+function initTheme() {
+  const toggle = $("themeToggle");
+  if (!toggle) return;
+  toggle.setAttribute(
+    "aria-checked",
+    String(document.documentElement.dataset.theme === "dark"),
+  );
+  toggle.addEventListener("click", () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(next, true);
+  });
+}
+
+/* ---------- Utilidades ---------- */
 
 function showAlert(msg, type) {
   const b = $("alertBox");
@@ -38,38 +114,22 @@ function clearAlert() {
   if (b) b.className = "alert";
 }
 
-function fmtM(n) {
-  if (!n && n !== 0) return "-";
-  if (n >= 1e12) return (n / 1e12).toFixed(2) + "T";
-  if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-  return n.toLocaleString();
-}
-
-function formatDateNasdaq() {
+// Fecha y hora reales de la costa Este de EE.UU.
+function etDateParts() {
   const now = new Date();
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const month = months[now.getMonth()];
-  const day = now.getDate();
-  const year = now.getFullYear();
-  let hours = now.getHours();
-  const minutes = now.getMinutes().toString().padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12;
-  return `Data as of ${month} ${day}, ${year} ${hours}:${minutes} ${ampm} ET`;
+  const dateStr = new Intl.DateTimeFormat("es-ES", {
+    timeZone: "America/New_York",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(now);
+  const timeStr = new Intl.DateTimeFormat("es-ES", {
+    timeZone: "America/New_York",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+  return { dateStr, timeStr };
 }
 
 async function fetchAPI(path) {
@@ -90,6 +150,8 @@ function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/* ---------- Carga de datos ---------- */
+
 async function loadAll() {
   clearAlert();
   const btn = $("refreshBtn"),
@@ -99,13 +161,15 @@ async function loadAll() {
   if (spin) spin.style.display = "inline-block";
   if (txt) txt.textContent = "Cargando...";
 
-  $("pageDate").textContent = formatDateNasdaq();
+  const et = etDateParts();
+  $("pageDate").textContent =
+    "Datos al " + et.dateStr + " · " + et.timeStr + " ET";
 
   try {
     const batch = await fetchAPI("/api/batch");
     stockData = (batch.data || []).map((r) => ({
-      symbol: r.symbol.trim(), // Aseguramos limpieza
-      name: r.symbol.trim(),
+      symbol: r.symbol.trim(),
+      name: NAMES[r.symbol.trim()] || r.symbol.trim(),
       price: r.price || 0,
       change: r.change || 0,
       changePercent: r.change_percent || 0,
@@ -138,61 +202,70 @@ async function loadAll() {
   if (txt) txt.textContent = "Actualizar";
 }
 
+/* ---------- Grilla de acciones ---------- */
+
+function cardHTML(s) {
+  const cls = s.changePercent >= 0 ? "up" : "down";
+  const sign = s.changePercent >= 0 ? "+" : "";
+  const arrow = s.changePercent >= 0 ? "▲" : "▼";
+  return `
+    <div class="stock-top-row">
+      <div class="stock-symbol">${s.symbol}</div>
+      <div class="stock-price">$${s.price.toFixed(2)}</div>
+    </div>
+    <div class="stock-name">${s.name}</div>
+    <div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
+  `;
+}
+
+// Crea o actualiza UNA tarjeta: sin parpadeos ni re-render completo
+function renderCard(s) {
+  const grid = $("stockGrid");
+  if (!grid) return;
+  let card = cards.get(s.symbol);
+  if (!card) {
+    card = document.createElement("div");
+    card.className = "stock-card";
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.addEventListener("click", () => selectSymbol(s.symbol));
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selectSymbol(s.symbol);
+      }
+    });
+    grid.appendChild(card);
+    cards.set(s.symbol, card);
+  }
+  card.className =
+    "stock-card" + (s.symbol === currentSymbol ? " selected" : "");
+  card.setAttribute("aria-pressed", String(s.symbol === currentSymbol));
+  card.setAttribute(
+    "aria-label",
+    s.symbol + " " + s.name + " $" + s.price.toFixed(2),
+  );
+  card.innerHTML = cardHTML(s);
+}
+
 function renderGrid() {
-  const rows = [$("gridRow1"), $("gridRow2"), $("gridRow3")];
-  rows.forEach((r) => {
-    if (r) r.innerHTML = "";
-  });
-
-  stockData.forEach((s, idx) => {
-    const rowIdx = Math.floor(idx / 5);
-    const row = rows[rowIdx];
-    if (!row) return;
-
-    const card = document.createElement("div");
-    card.className =
-      "stock-card" + (s.symbol === currentSymbol ? " selected" : "");
-    card.onclick = () => selectSymbol(s.symbol);
-
-    const cls = s.changePercent >= 0 ? "up" : "down";
-    const sign = s.changePercent >= 0 ? "+" : "";
-    const arrow = s.changePercent >= 0 ? "▲" : "▼";
-
-    card.innerHTML = `
-      <div class="stock-row" id="stock-row">
-        <div class="stock-symbol">${s.symbol}</div>
-        <div class="stock-price">$${s.price.toFixed(2)}</div>
-      </div>
-      <div class="stock-name">${s.name}</div>
-      <div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
-    `;
-    row.appendChild(card);
-  });
+  stockData.forEach(renderCard);
 }
 
 function selectSymbol(sym) {
   currentSymbol = sym;
-  document
-    .querySelectorAll(".stock-card")
-    .forEach((c) => c.classList.remove("selected"));
-  document.querySelectorAll(".stock-card").forEach((c) => {
-    if (c.querySelector(".stock-symbol")?.textContent === sym) {
-      c.classList.add("selected");
-    }
+  cards.forEach((card, symbol) => {
+    const selected = symbol === sym;
+    card.classList.toggle("selected", selected);
+    card.setAttribute("aria-pressed", String(selected));
   });
   loadChart(sym, currentTimeframe);
 }
 
+/* ---------- Stats ---------- */
+
 function updateStats() {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const dateStr = now.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "short",
-  });
+  const et = etDateParts();
 
   const loaded = stockData.filter((s) => s.price > 0).length;
   const gainers = stockData.filter((s) => s.changePercent > 0).length;
@@ -216,9 +289,13 @@ function updateStats() {
         : "Sesión mixta";
   $("statTrend").className =
     "stat-sub " + (gainers > losers ? "up" : losers > gainers ? "down" : "");
-  $("statDate").textContent = dateStr;
-  $("statTime").textContent = timeStr;
+  $("statDate").textContent = et.dateStr
+    .replace(" de ", " ")
+    .replace(" de ", "");
+  $("statTime").textContent = et.timeStr + " ET";
 }
+
+/* ---------- Detalles en segundo plano ---------- */
 
 async function loadDetailsInBackground() {
   for (let i = 0; i < stockData.length; i++) {
@@ -228,7 +305,8 @@ async function loadDetailsInBackground() {
         fetchAPI("/api/profile?symbol=" + encodeURIComponent(s.symbol)),
         fetchAPI("/api/metric?symbol=" + encodeURIComponent(s.symbol)),
       ]);
-      s.name = profile.name || s.symbol;
+      // Solo actualiza campos si la API trae datos reales; el nombre estático es la base
+      if (profile.name && profile.name !== s.symbol) s.name = profile.name;
       s.marketCap = profile.marketCapitalization
         ? profile.marketCapitalization * 1e6
         : 0;
@@ -238,7 +316,7 @@ async function loadDetailsInBackground() {
       s.fiftyTwoWeekLow = m["52WeekLow"] || 0;
       s.fiftyTwoWeekHigh = m["52WeekHigh"] || 0;
 
-      renderGrid();
+      renderCard(s); // actualiza solo esta tarjeta
       if (s.symbol === currentSymbol) updateChartHeader(s);
       await wait(800);
     } catch (e) {
@@ -246,6 +324,8 @@ async function loadDetailsInBackground() {
     }
   }
 }
+
+/* ---------- Header del gráfico ---------- */
 
 function updateChartHeader(s) {
   $("chartSymbol").textContent = s.symbol;
@@ -259,47 +339,145 @@ function updateChartHeader(s) {
   chg.className = "chart-change " + cls;
 }
 
-function updatePeriodPerformance(
-  symbol,
-  timeframe,
-  first,
-  last,
-  change,
-  percentChange,
-) {
-  const container = document.getElementById("rendimiento");
+/* ---------- Rendimiento del período ---------- */
+
+function updatePeriodPerformance(symbol, timeframe, change, percentChange) {
+  const container = $("rendimiento");
   if (!container) return;
   const isPositive = percentChange >= 0;
   const sign = isPositive ? "+" : "";
   const arrow = isPositive ? "▲" : "▼";
-  const colorClass = isPositive ? "up" : "down";
   const periodLabels = {
-    "1D": "1 Día",
-    "1W": "1 Semana",
-    "1M": "1 Mes",
-    "3M": "3 Meses",
-    "6M": "6 Meses",
-    "1Y": "1 Año",
-    MAX: "Máximo Histórico",
+    "1D": "1 día",
+    "1W": "1 semana",
+    "1M": "1 mes",
+    "3M": "3 meses",
+    "6M": "6 meses",
+    "1Y": "1 año",
+    MAX: "máximo histórico",
   };
   const label = periodLabels[timeframe] || timeframe;
 
   container.innerHTML = `
-    <div class="chart-header">
-      <div class="chart-title-group">
-        <span class="chart-symbol">${symbol}</span>
-        <span class="chart-name">Rendimiento (${label})</span>
-        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"};"> ${sign}${percentChange.toFixed(2)}% </span>
-        <span class="chart-change ${colorClass}" id="chartPeriodChange"> ${arrow} ${sign}$${Math.abs(change).toFixed(2)} </span>
-      </div>
+    <div class="rend-inner">
+      <span class="rend-title">Rendimiento</span>
+      <span class="rend-symbol">${symbol} · ${label}</span>
+      <span class="rend-value ${isPositive ? "up" : "down"}">${sign}${percentChange.toFixed(2)}% ${arrow} ${sign}$${Math.abs(change).toFixed(2)}</span>
     </div>`;
+}
+
+/* ---------- Gráfico ---------- */
+
+function buildChart(animate) {
+  if (!lastSeries) return;
+  const { labels, prices, symbol, change } = lastSeries;
+  const canvas = $("mainChart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const tc = themeColors();
+
+  const color = change >= 0 ? "rgba(26, 127, 55, 1)" : "rgba(207, 34, 46, 1)";
+  const lineColor =
+    document.documentElement.dataset.theme === "dark"
+      ? change >= 0
+        ? "#3fb950"
+        : "#f85149"
+      : color;
+
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, 320);
+  bgGradient.addColorStop(
+    0,
+    change >= 0
+      ? document.documentElement.dataset.theme === "dark"
+        ? "rgba(63, 185, 80, 0.18)"
+        : "rgba(26, 127, 55, 0.12)"
+      : document.documentElement.dataset.theme === "dark"
+        ? "rgba(248, 81, 73, 0.18)"
+        : "rgba(207, 34, 46, 0.12)",
+  );
+  bgGradient.addColorStop(1, tc.transparent);
+
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: symbol,
+          data: prices,
+          borderColor: lineColor,
+          backgroundColor: bgGradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1,
+          pointRadius: prices.length < 50 ? 2 : 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: lineColor,
+          pointHoverBorderColor: tc.tooltipBg,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation:
+        animate === false ? false : { duration: 900, easing: "easeOutQuart" },
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: tc.tooltipBg,
+          titleColor: "#e6edf3",
+          bodyColor: "#e6edf3",
+          borderColor: tc.tooltipBorder,
+          borderWidth: 1,
+          titleFont: { family: "'IBM Plex Mono', monospace" },
+          bodyFont: { family: "'IBM Plex Mono', monospace" },
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: function (context) {
+              return symbol + ": $" + context.parsed.y.toFixed(2);
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: tc.grid, drawTicks: false },
+          border: { display: false },
+          ticks: {
+            color: tc.tick,
+            maxTicksLimit: window.innerWidth < 768 ? 5 : 8,
+            maxRotation: 0,
+            autoSkip: true,
+            font: { family: "'IBM Plex Mono', monospace", size: 10.5 },
+          },
+        },
+        y: {
+          position: "right",
+          grid: { color: tc.grid, drawTicks: false },
+          border: { display: false },
+          ticks: {
+            color: tc.tick,
+            callback: function (value) {
+              return "$" + value.toFixed(2);
+            },
+            maxTicksLimit: 6,
+            font: { family: "'IBM Plex Mono', monospace", size: 10.5 },
+          },
+        },
+      },
+    },
+  });
 }
 
 async function loadChart(symbol, timeframe) {
   currentSymbol = symbol;
   currentTimeframe = timeframe;
   document.querySelectorAll(".tf-btn").forEach((b) => {
-    b.classList.toggle("active", b.textContent.trim() === timeframe);
+    b.classList.toggle("active", b.dataset.tf === timeframe);
   });
 
   const s = stockData.find((x) => x.symbol === symbol);
@@ -312,17 +490,18 @@ async function loadChart(symbol, timeframe) {
         "&period=" +
         timeframe,
     );
-    let points = hist.data || [];
+    const points = hist.data || [];
 
     if (points.length === 0) {
+      lastSeries = null;
       if (chartInstance) {
         chartInstance.destroy();
         chartInstance = null;
       }
-      const container = document.getElementById("rendimiento");
+      const container = $("rendimiento");
       if (container)
         container.innerHTML =
-          '<p style="color:#666; text-align:center; padding: 10px;">Sin datos históricos para este período.</p>';
+          '<p class="rend-msg">Sin datos históricos para este período.</p>';
       return;
     }
 
@@ -342,101 +521,46 @@ async function loadChart(symbol, timeframe) {
     });
 
     const prices = points.map((p) => p.price);
-    const last = points[points.length - 1];
-    const first = points[0];
-    const change = last.price - first.price;
-    const percentChange = ((last.price - first.price) / first.price) * 100;
+    const change = prices[prices.length - 1] - prices[0];
+    const percentChange = (change / prices[0]) * 100;
 
-    updatePeriodPerformance(
-      symbol,
-      timeframe,
-      first,
-      last,
-      change,
-      percentChange,
-    );
-
-    const canvas = $("mainChart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const color = change >= 0 ? "#1a7f37" : "#cf222e";
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, 320);
-    bgGradient.addColorStop(
-      0,
-      change >= 0 ? "rgba(26,127,55,0.12)" : "rgba(207,34,46,0.12)",
-    );
-    bgGradient.addColorStop(1, "rgba(255,255,255,0)");
-
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: symbol,
-            data: prices,
-            borderColor: color,
-            backgroundColor: bgGradient,
-            borderWidth: 2,
-            fill: true,
-            tension: 0.1,
-            pointRadius: points.length < 50 ? 2 : 0,
-            pointHoverRadius: 4,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "rgba(13,17,23,0.9)",
-            titleColor: "#e6edf3",
-            bodyColor: "#e6edf3",
-            borderColor: "#30363d",
-            borderWidth: 1,
-            callbacks: {
-              label: function (context) {
-                return symbol + ": $" + context.parsed.y.toFixed(2);
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            grid: { color: "rgba(225,228,232,0.6)", drawBorder: false },
-            ticks: { color: "#5f6b7a", maxTicksLimit: 8 },
-          },
-          y: {
-            grid: { color: "rgba(225,228,232,0.6)", drawBorder: false },
-            ticks: {
-              color: "#5f6b7a",
-              callback: function (value) {
-                return "$" + value.toFixed(2);
-              },
-              maxTicksLimit: 6,
-            },
-          },
-        },
-      },
-    });
+    lastSeries = { labels, prices, symbol, change };
+    updatePeriodPerformance(symbol, timeframe, change, percentChange);
+    buildChart();
   } catch (e) {
     console.error("Error cargando gráfico", e);
-    const container = document.getElementById("rendimiento");
+    const container = $("rendimiento");
     if (container)
       container.innerHTML =
-        '<p style="color:#cf222e; text-align:center; padding: 10px;">Error al cargar el rendimiento.</p>';
+        '<p class="rend-msg">Error al cargar el rendimiento.</p>';
   }
 }
 
 function setTimeframe(tf) {
-  currentTimeframe = tf;
+  if (tf === currentTimeframe && chartInstance) return;
   loadChart(currentSymbol, tf);
 }
 
+/* ---------- Inicio ---------- */
+
 document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  document.querySelectorAll(".tf-btn").forEach((b) => {
+    b.addEventListener("click", () => setTimeframe(b.dataset.tf));
+  });
+  const refresh = $("refreshBtn");
+  if (refresh) refresh.addEventListener("click", loadAll);
+  // Si el usuario cambia el tema del sistema y no ha elegido uno manual, lo seguimos
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (e) => {
+      let saved = null;
+      try {
+        saved = localStorage.getItem(THEME_KEY);
+      } catch (err) {}
+      if (saved !== "light" && saved !== "dark") {
+        applyTheme(e.matches ? "dark" : "light", false);
+      }
+    });
   loadAll();
 });
