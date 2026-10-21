@@ -16,6 +16,7 @@ const SYMBOLS = [
   "CSCO",
   "INTC",
 ];
+
 let stockData = [];
 let currentSymbol = "AAPL";
 let currentTimeframe = "1M";
@@ -103,8 +104,8 @@ async function loadAll() {
   try {
     const batch = await fetchAPI("/api/batch");
     stockData = (batch.data || []).map((r) => ({
-      symbol: r.symbol,
-      name: r.symbol,
+      symbol: r.symbol.trim(), // Aseguramos limpieza
+      name: r.symbol.trim(),
       price: r.price || 0,
       change: r.change || 0,
       changePercent: r.change_percent || 0,
@@ -158,13 +159,13 @@ function renderGrid() {
     const arrow = s.changePercent >= 0 ? "▲" : "▼";
 
     card.innerHTML = `
-    <div class="stock-row" id="stock-row">
-<div class="stock-symbol">${s.symbol}</div>
-<div class="stock-price">$${s.price.toFixed(2)}</div>
-</div>
-<div class="stock-name">${s.name}</div>
-<div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
- `;
+      <div class="stock-row" id="stock-row">
+        <div class="stock-symbol">${s.symbol}</div>
+        <div class="stock-price">$${s.price.toFixed(2)}</div>
+      </div>
+      <div class="stock-name">${s.name}</div>
+      <div class="stock-change ${cls}">${arrow} ${sign}${s.change.toFixed(2)} (${sign}${s.changePercent.toFixed(2)}%)</div>
+    `;
     row.appendChild(card);
   });
 }
@@ -174,8 +175,7 @@ function selectSymbol(sym) {
   document
     .querySelectorAll(".stock-card")
     .forEach((c) => c.classList.remove("selected"));
-  const cards = document.querySelectorAll(".stock-card");
-  cards.forEach((c) => {
+  document.querySelectorAll(".stock-card").forEach((c) => {
     if (c.querySelector(".stock-symbol")?.textContent === sym) {
       c.classList.add("selected");
     }
@@ -197,9 +197,6 @@ function updateStats() {
   const loaded = stockData.filter((s) => s.price > 0).length;
   const gainers = stockData.filter((s) => s.changePercent > 0).length;
   const losers = stockData.filter((s) => s.changePercent < 0).length;
-  const flat = stockData.filter(
-    (s) => s.changePercent === 0 && s.price > 0,
-  ).length;
 
   $("statStatus").textContent =
     loaded === SYMBOLS.length ? "Conectado" : "Parcial";
@@ -208,10 +205,8 @@ function updateStats() {
       ? "D1 + Finnhub"
       : SYMBOLS.length - loaded + " sin datos";
   $("statStatusSub").className =
-    "stat-sub" + (loaded < SYMBOLS.length ? " down" : "");
-
+    "stat-sub " + (loaded < SYMBOLS.length ? "down" : "");
   $("statCount").textContent = loaded + "/" + SYMBOLS.length;
-
   $("statGainers").textContent = gainers + " / " + losers;
   $("statTrend").textContent =
     gainers > losers
@@ -221,7 +216,6 @@ function updateStats() {
         : "Sesión mixta";
   $("statTrend").className =
     "stat-sub " + (gainers > losers ? "up" : losers > gainers ? "down" : "");
-
   $("statDate").textContent = dateStr;
   $("statTime").textContent = timeStr;
 }
@@ -243,6 +237,7 @@ async function loadDetailsInBackground() {
       s.pe = m.peTTM || m.peExclExtraTTM || null;
       s.fiftyTwoWeekLow = m["52WeekLow"] || 0;
       s.fiftyTwoWeekHigh = m["52WeekHigh"] || 0;
+
       renderGrid();
       if (s.symbol === currentSymbol) updateChartHeader(s);
       await wait(800);
@@ -264,7 +259,6 @@ function updateChartHeader(s) {
   chg.className = "chart-change " + cls;
 }
 
-// ── Función para mostrar el rendimiento del período seleccionado ──
 function updatePeriodPerformance(
   symbol,
   timeframe,
@@ -275,12 +269,10 @@ function updatePeriodPerformance(
 ) {
   const container = document.getElementById("rendimiento");
   if (!container) return;
-
   const isPositive = percentChange >= 0;
   const sign = isPositive ? "+" : "";
   const arrow = isPositive ? "▲" : "▼";
   const colorClass = isPositive ? "up" : "down";
-
   const periodLabels = {
     "1D": "1 Día",
     "1W": "1 Semana",
@@ -297,24 +289,17 @@ function updatePeriodPerformance(
       <div class="chart-title-group">
         <span class="chart-symbol">${symbol}</span>
         <span class="chart-name">Rendimiento (${label})</span>
-        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"};">
-          ${sign}${percentChange.toFixed(2)}%
-        </span>
-        <span class="chart-change ${colorClass}" id="chartPeriodChange">
-          ${arrow} ${sign}$${Math.abs(change).toFixed(2)}
-        </span>
+        <span class="chart-price" id="chartPeriodPrice" style="color: ${isPositive ? "#1a7f37" : "#cf222e"};"> ${sign}${percentChange.toFixed(2)}% </span>
+        <span class="chart-change ${colorClass}" id="chartPeriodChange"> ${arrow} ${sign}$${Math.abs(change).toFixed(2)} </span>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-// ── GRÁFICO ───────────────────────────────────────────────────────
 async function loadChart(symbol, timeframe) {
   currentSymbol = symbol;
   currentTimeframe = timeframe;
-
   document.querySelectorAll(".tf-btn").forEach((b) => {
-    b.classList.toggle("active", b.textContent === timeframe);
+    b.classList.toggle("active", b.textContent.trim() === timeframe);
   });
 
   const s = stockData.find((x) => x.symbol === symbol);
@@ -347,7 +332,6 @@ async function loadChart(symbol, timeframe) {
       const allSameDay = points.every(
         (p) => new Date(p.timestamp * 1000).toDateString() === firstDate,
       );
-
       if (timeframe === "1D" || allSameDay) {
         return d.toLocaleTimeString("es-ES", {
           hour: "2-digit",
@@ -361,9 +345,8 @@ async function loadChart(symbol, timeframe) {
     const last = points[points.length - 1];
     const first = points[0];
     const change = last.price - first.price;
-
-    // ── Cálculo del porcentaje de rendimiento del período ──
     const percentChange = ((last.price - first.price) / first.price) * 100;
+
     updatePeriodPerformance(
       symbol,
       timeframe,
@@ -372,7 +355,6 @@ async function loadChart(symbol, timeframe) {
       change,
       percentChange,
     );
-    // ──────────────────────────────────────────────────────────────
 
     const canvas = $("mainChart");
     if (!canvas) return;
@@ -386,7 +368,6 @@ async function loadChart(symbol, timeframe) {
     bgGradient.addColorStop(1, "rgba(255,255,255,0)");
 
     if (chartInstance) chartInstance.destroy();
-
     chartInstance = new Chart(ctx, {
       type: "line",
       data: {
@@ -456,7 +437,6 @@ function setTimeframe(tf) {
   loadChart(currentSymbol, tf);
 }
 
-// Inicializar
 document.addEventListener("DOMContentLoaded", () => {
   loadAll();
 });
