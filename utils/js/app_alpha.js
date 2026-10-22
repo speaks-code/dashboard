@@ -1,6 +1,6 @@
 // ========== CONFIGURACIÓN ==========
 const RESEARCH_API =
-  "https://ox-alpha-research.TU-SUBDOMINIO.workers.dev/research";
+  "https://app-alpha.despachodigitalizacion.workers.dev/research";
 // Reemplaza TU_SITE_KEY_AQUI en el HTML por tu Site Key de Turnstile
 
 let turnstileToken = null;
@@ -126,8 +126,6 @@ async function sendResearch() {
     document.getElementById("questionInput").value = "";
   }
 }
-
-// Auto-resize del textarea
 const textarea = document.getElementById("questionInput");
 textarea.addEventListener("input", () => {
   textarea.style.height = "auto";
