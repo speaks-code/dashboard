@@ -39,7 +39,7 @@ body {
     padding: 20px 16px;
 }
 
-.sidebar h3 {
+h3 {
     font-size: 11px;
     letter-spacing: 1.2px;
     color: var(--text-muted);
@@ -81,6 +81,19 @@ body {
 .model-id {
     font-size: 12px;
     color: var(--text-muted);
+}
+
+.icono {
+    width: 22px;
+    height: 22px;
+    background: #f59e0b;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: #111;
 }
 
 .sidebar-actions {
@@ -278,20 +291,65 @@ body {
     cursor: not-allowed;
 }
 
-/* Turnstile */
+/* Cloudflare Turnstile */
 .turnstile-container {
-    margin-top: 12px;
+    width: 100%;
+    margin: 12px auto;
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    gap: 8px;
+    transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+}
+
+.turnstile-container.hidden {
+    display: none;
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+}
+
+#turnstile-status {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
 }
 
 .footer-info {
-    display: flex;
-    justify-content: space-between;
     max-width: 900px;
     margin: 10px auto 0;
     font-size: 12px;
     color: var(--text-muted);
+}
+
+.footer-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.footer-text {
+    font-family: var(--mono);
+    min-width: 0;
+}
+
+.text-l {
+    text-align: left;
+    margin-right: auto;
+}
+
+.text-r {
+    text-align: right;
+    margin-left: auto;
 }
 
 /* Sources (opcional) */
