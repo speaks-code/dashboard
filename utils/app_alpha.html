@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
   <head>
     <meta charset="UTF-8" />
@@ -28,9 +28,9 @@
     <main class="main">
       <header class="header">
 
-        <div class="model-merge" id="">
+        <div class="model-merge">
           <div class="model-card">
-            <div class="model-title" id="">
+            <div class="model-title">
               <h3>Models</h3>
             </div>
             <div class="model-dot"></div>
@@ -41,7 +41,7 @@
           </div>
 
           <div class="model-card">
-            <div class="" id="">
+            <div class="model-title">
               <h3>Provider</h3>
             </div>
             <div class="icono">CF</div>
@@ -66,12 +66,34 @@
         </div>
       </div>
 
-      <div class="turnstile-container" id="turnstileContainer">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAAFhHuDmiUwwzRWzG" data-callback="onTurnstileSuccess"
-          data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"
-          data-size="normal">
+      <!-- Turnstile verification zone -->
+      <div class="turnstile-zone" id="turnstileContainer">
+        <div class="turnstile-card">
+          <div class="turnstile-header">
+            <div class="turnstile-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="turnstile-title">Verificación de seguridad</div>
+              <div class="turnstile-subtitle">Completa el captcha para continuar</div>
+            </div>
+          </div>
+
+          <div class="turnstile-widget">
+            <div class="cf-turnstile"
+              data-sitekey="0x4AAAAAAFhHuDmiUwwzRWzG"
+              data-callback="onTurnstileSuccess"
+              data-expired-callback="onTurnstileExpired"
+              data-error-callback="onTurnstileError"
+              data-theme="dark"
+              data-size="normal">
+            </div>
+          </div>
+
+          <p id="turnstile-status" class="turnstile-status" role="status" aria-live="polite"></p>
         </div>
-        <p id="turnstile-status" role="status" aria-live="polite"></p>
       </div>
 
       <div class="input-area">
@@ -92,28 +114,19 @@
         </div>
 
         <div class="footer-info" id="footer-info">
-
           <div class="footer-flex" id="footer-flex">
-
-            <div class="footer-text text-l" id="footer-api">
+            <div class="footer-text text-l">
               <span class="span-footer">API: Cloudflare Worker · Rate limit + Turnstile activos</span>
             </div>
-
-            <div class="footer-text text-r" id="footer-api">
+            <div class="footer-text text-r">
               <span class="span-footer">Model: @cf/meta/llama-3.1-8b-instruct-fp8</span>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </main>
+
     <script src="js/app_alpha.js"></script>
-    <script src="js/turnstile_check.js"></script>
-    <script>
-      
-    </script>
   </body>
 
 </html>
