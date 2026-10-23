@@ -166,15 +166,8 @@ h3 {
 }
 
 @keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.4;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 /* Chat area */
@@ -234,6 +227,107 @@ h3 {
     color: #fecaca;
 }
 
+/* ===== Turnstile zone ===== */
+.turnstile-zone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 24px 8px;
+    max-height: 280px;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        max-height 0.35s ease,
+        padding 0.35s ease;
+    overflow: hidden;
+}
+
+.turnstile-zone.is-leaving {
+    opacity: 0;
+    transform: translateY(-12px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    pointer-events: none;
+}
+
+.turnstile-zone.is-hidden {
+    display: none;
+}
+
+.turnstile-card {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, #151c2c 0%, #1a2234 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px 18px;
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(245, 158, 11, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.turnstile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.turnstile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.turnstile-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.2px;
+}
+
+.turnstile-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.turnstile-widget {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.turnstile-status {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-align: center;
+    min-height: 18px;
+    transition: color 0.2s;
+}
+
+.turnstile-status.success {
+    color: var(--success);
+    font-weight: 500;
+}
+
+.turnstile-status.error {
+    color: var(--error);
+}
+
 /* Input area */
 .input-area {
     border-top: 1px solid var(--border);
@@ -278,7 +372,7 @@ h3 {
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s, transform 0.15s;
     white-space: nowrap;
 }
 
@@ -286,40 +380,13 @@ h3 {
     background: var(--accent-hover);
 }
 
+.btn-send:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
 .btn-send:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
-}
-
-/* Cloudflare Turnstile */
-.turnstile-container {
-    width: 100%;
-    margin: 12px auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    gap: 8px;
-    transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-    overflow: hidden;
-}
-
-.turnstile-container.hidden {
-    display: none;
-    opacity: 0;
-    max-height: 0;
-    margin: 0;
-    padding: 0;
-    pointer-events: none;
-}
-
-#turnstile-status {
-    width: 100%;
-    text-align: center;
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
 }
 
 .footer-info {
@@ -359,6 +426,11 @@ h3 {
     cursor: pointer;
     margin-bottom: 8px;
     display: inline-block;
+    transition: color 0.15s;
+}
+
+.sources-toggle:hover {
+    color: var(--accent);
 }
 
 .sources-box {
