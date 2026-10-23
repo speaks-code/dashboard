@@ -44,9 +44,7 @@
             <div class="" id="">
               <h3>Provider</h3>
             </div>
-            <div
-              style="width:22px;height:22px;background:#f59e0b;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#111;">
-              CF</div>
+            <div class="icono">CF</div>
             <div>
               <div class="model-name">Cloudflare</div>
               <div class="model-id">Workers AI</div>
@@ -68,6 +66,14 @@
         </div>
       </div>
 
+      <div class="turnstile-container" id="turnstileContainer">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAFhHuDmiUwwzRWzG" data-callback="onTurnstileSuccess"
+          data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"
+          data-size="normal">
+        </div>
+        <p id="turnstile-status" role="status" aria-live="polite"></p>
+      </div>
+
       <div class="input-area">
         <div style="max-width:900px;margin:0 auto;">
           <span class="sources-toggle" onclick="toggleSources()">+ Añadir material fuente (opcional)</span>
@@ -85,26 +91,29 @@
           </button>
         </div>
 
-        <!-- Cloudflare Turnstile -->
-        <div class="turnstile-container">
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFhHuDmiUwwzRWzG" data-callback="onTurnstileSuccess"
-            data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"
-            data-size="normal">
+        <div class="footer-info" id="footer-info">
+
+          <div class="footer-flex" id="footer-flex">
+
+            <div class="footer-text text-l" id="footer-api">
+              <span class="span-footer">API: Cloudflare Worker · Rate limit + Turnstile activos</span>
+            </div>
+
+            <div class="footer-text text-r" id="footer-api">
+              <span class="span-footer">Model: @cf/meta/llama-3.1-8b-instruct-fp8</span>
+            </div>
+
           </div>
+
         </div>
 
-        <p id="turnstile-status" role="status" aria-live="polite"></p>
-
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
-        </script>
-
-        <div class="footer-info">
-          <span>API: Cloudflare Worker · Rate limit + Turnstile activos</span>
-          <span>Model: @cf/meta/llama-3.1-8b-instruct-f8</span>
-        </div>
       </div>
     </main>
     <script src="js/app_alpha.js"></script>
+    <script src="js/turnstile_check.js"></script>
+    <script>
+      
+    </script>
   </body>
 
 </html>
