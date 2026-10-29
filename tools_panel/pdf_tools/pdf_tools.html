@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Limpiador de Fondo PDF — 460 páginas</title>
+        <!-- GOOGLE FONTS -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+        <!-- SCRIPT -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+        <!-- StylelSheet -->
+        <link rel="stylesheet" href="css/css_pdf_tools.css">
+    </head>
+
+    <body>
+        <div class="container" id="container">
+            <div class="row row-espaciador" id="row-espaciador"></div>
+
+            <div class="row row-encabezado" id="row-encabezado">
+                <header class="headers">
+                    <div class="fila-top apilada">
+                        <div class="row_rotulo">
+                            <div class="rotulo">Sistema de Gestión Documental</div>
+                            <h1>Limpiador de Fondo <em>PDF</em></h1>
+                        </div>
+                        <div class="row_entradilla">
+                            <p class="entradilla">Elimina fondos grises de escaneos y mejora el contraste del texto.
+                                Procesamiento 100% en el navegador.</p>
+                            <div class="badge">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" aria-hidden="true">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                Procesamiento local · Sin transmisión de datos
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <main class="pdf-tools" id="pdf-tools">
+                <div class="row row-carga" id="row-carga">
+                    <section class="card" aria-label="Selección de PDF">
+                        <div class="drop-zone" id="dropZone">
+                            <input type="file" id="pdfInput" accept=".pdf">
+                            <div class="icon" aria-hidden="true">📄</div>
+                            <p><strong>Arrastra tu PDF aquí</strong> o haz clic para seleccionar</p>
+                            <p class="help-text">Soporta archivos grandes (hasta 460+ páginas)</p>
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display: none;">
+                            <p>📎 <strong id="fileName"></strong> — <span id="fileSize"></span></p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="row row-configuracion" id="row-configuracion">
+                    <section class="card settings-card is-disabled" id="settingsCard" aria-label="Configuración"
+                        style="opacity: 0.5; pointer-events: none;">
+                        <h2 class="card-title">Configuración</h2>
+                        <div class="controls">
+                            <div class="control-group">
+                                <label for="dpi">Resolución (DPI) <span class="value-display"
+                                        id="dpiVal">200</span></label>
+                                <input type="range" id="dpi" min="150" max="300" value="200">
+                            </div>
+                            <div class="control-group">
+                                <label for="contrast">Factor de Contraste <span class="value-display"
+                                        id="contrastVal">2.2</span></label>
+                                <input type="range" id="contrast" min="1.0" max="4.0" step="0.1" value="2.2">
+                            </div>
+                            <div class="control-group">
+                                <label for="tolerance">Tolerancia de Fondo <span class="value-display"
+                                        id="toleranceVal">35</span></label>
+                                <input type="range" id="tolerance" min="10" max="80" value="35">
+                            </div>
+                            <div class="control-group">
+                                <label for="minBright">Brillo Mín. Fondo <span class="value-display"
+                                        id="minBrightVal">200</span></label>
+                                <input type="range" id="minBright" min="150" max="240" value="200">
+                            </div>
+                        </div>
+                        <div class="button-row">
+                            <button id="previewBtn" type="button">Vista previa (página 1)</button>
+                            <button id="processBtn" type="button">Procesar todas las páginas</button>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="row row-vista-previa" id="row-vista-previa">
+                    <section class="card preview-area" id="previewArea" aria-label="Vista previa">
+                        <h2 class="card-title">Vista previa — Página 1</h2>
+                        <div class="preview-grid">
+                            <div class="preview-box">
+                                <span>ORIGINAL</span>
+                                <canvas id="originalCanvas"></canvas>
+                            </div>
+                            <div class="preview-box">
+                                <span>PROCESADA</span>
+                                <canvas id="processedCanvas"></canvas>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="row row-progreso" id="row-progreso">
+                    <section class="card progress-container" id="progressContainer"
+                        aria-label="Progreso del procesamiento">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressStatus">Iniciando...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="stats">
+                            <div class="stat-box">
+                                <div class="number" id="statPage">0</div>
+                                <div class="label">Página actual</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="number" id="statTime">0:00</div>
+                                <div class="label">Tiempo transcurrido</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="number" id="statETA">--:--</div>
+                                <div class="label">Tiempo restante estimado</div>
+                            </div>
+                        </div>
+                        <div class="log" id="log"></div>
+                    </section>
+                </div>
+
+                <div class="row row-descarga" id="row-descarga">
+                    <section class="download-area" id="downloadArea">
+                        <a href="#" id="downloadLink" download="documento_limpio.pdf">Descargar PDF limpio</a>
+                        <p class="download-info" id="downloadInfo"></p>
+                    </section>
+                </div>
+            </main>
+
+            <div class="row row-pie" id="row-pie">
+                <footer>
+                    <div class="contenido-pie">
+                        <span>© 2026 Sistema de Gestión Documental Estatal</span>
+                        <span>Procesamiento local · Sin dependencia de nube</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script src="js/js_pdf_tools.js"></script>
+    </body>
+
+</html>
+<!-- el codigo de la presente pagina no puede ser utilizado con fines comerciales. -->
