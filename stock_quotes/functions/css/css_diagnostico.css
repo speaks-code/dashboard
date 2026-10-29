@@ -1,0 +1,175 @@
+:root {
+  --bg: #f5f6f7;
+  --bg-card: #ffffff;
+  --border: #e1e4e8;
+  --border-hover: #0969da;
+  --text-primary: #25252c;
+  --text-secondary: #5f6b7a;
+  --text-muted: #8c959f;
+  --positive: #1a7f37;
+  --positive-bg: #dafbe1;
+  --danger: #cf222e;
+  --danger-bg: #ffebe9;
+  --accent: #0969da;
+  --btnText-refresh: #4B42FF;
+  --btnText-gray: #25252c;
+
+  /* --- Tipografía Google --- */
+  --mono:  'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --serif: 'Instrument Serif', Georgia, serif;
+
+  /* --- Layout --- */
+  --ancho-max:       1060px;
+  --padding-lateral: 28px;
+
+  /* --- Sombras y radios (unificados) --- */
+  --radio:        2px;
+  --sombra-dura:  4px 4px 0 var(--linea-media);
+  --sombra-hover: 3px 3px 0 var(--tinta);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--mono);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 var(--padding-lateral);
+  width: 100%;
+}
+
+/* ========================================================================== */
+/* Estilo encabezado */
+/* ========================================================================== */
+
+
+header {
+  padding: 2px 0 30px;
+}
+
+.row {
+    width: 100%;
+}
+
+header .container .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+    border: 1px solid #646262;
+}
+
+header .container .row .row-column {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+
+header .container .row .row-file {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+}
+
+header .container .row .row-between {
+  display: flex;
+  align-items: center;        /* o flex-start si quieres arriba */
+  justify-content: space-between; /* ← clave: primer hijo izq., último hijo der. */
+  width: 100%;                /* asegura que ocupe todo el ancho del padre */
+  gap: 16px;                  /* espacio mínimo entre ambos spans */
+}
+
+header .container .row .row-right {
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: 0px;
+}
+
+/* ---------- Estructura: novena al centro, décima a la derecha ---------- */
+.row-right-between {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-top: 0;
+    color: #0070f3;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+input,
+select,
+button {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+button {
+    background: #0070f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #0051a2;
+}
+
+pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    max-height: 400px;
+    font-size: 0.85em;
+}
+
+.error {
+    color: #e00;
+    background: #ffe6e6;
+}
+
+.success {
+    color: #0a0;
+    background: #e6ffe6;
+}
