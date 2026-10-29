@@ -75,9 +75,9 @@ body {
 }
 
 .container {
-  max-width: 1160px;
+  max-width: 1060px;
   margin: 0 auto;
-  padding: 28px 20px;
+  padding: 2px 20px;
 }
 
 /* ---------- Header ---------- */
