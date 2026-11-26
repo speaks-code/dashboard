@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Ajustes del dashboard — se carga DESPUÉS de css_dashboard.css
+   No modifica el CSS original: solo agrega el cuadro de cotización del
+   encabezado del gráfico (precio + variación) en verde / rojo con letras
+   blancas, respetando el tema claro / oscuro (data-theme del <html>).
+   ========================================================================== */
+
+:root {
+  --quote-up-bg: #1a7f37;
+  --quote-down-bg: #cf222e;
+  --quote-fg: #ffffff;
+}
+
+/* Tonos algo más oscuros en el tema oscuro para que el texto blanco se lea */
+[data-theme="dark"] {
+  --quote-up-bg: #238636;
+  --quote-down-bg: #da3633;
+}
+
+.chart-quote {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.chart-quote.up {
+  background: var(--quote-up-bg);
+  color: var(--quote-fg);
+}
+
+.chart-quote.down {
+  background: var(--quote-down-bg);
+  color: var(--quote-fg);
+}
+
+/* Dentro del cuadro, precio y variación heredan el color y no llevan fondo propio */
+.chart-quote .chart-price,
+.chart-quote .chart-change {
+  color: inherit;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+@media (max-width: 560px) {
+  .chart-quote {
+    padding: 5px 10px;
+  }
+}
