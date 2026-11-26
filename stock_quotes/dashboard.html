@@ -10,10 +10,18 @@
     <meta name="theme-color" content="#f6f8fa">
     <link rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230969da'/%3E%3Cpath d='M18 46V18h6l16 20V18h6v28h-6L24 26v20z' fill='%23fff'/%3E%3C/svg%3E">
+
     <!-- GOOGLE FONTS -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-    <!-- StyleSheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+
+    <!-- StylelSheet -->
     <link rel="stylesheet" href="https://speaks-code.github.io/dashboard/stock_quotes/css/css_dashboard.css">
+    <!-- Ajuste estilos -->
+    <link rel="stylesheet" href="https://speaks-code.github.io/dashboard/stock_quotes/css/css_dashboard_ajustes.css">
+
     <!-- Evita parpadeo de tema: aplica el tema guardado antes de pintar -->
     <script>
       (function () {
@@ -37,18 +45,14 @@
           <p class="page-subtitle" id="pageDate">Datos al --</p>
         </div>
         <div class="header-right">
-          <button class="theme-toggle" id="themeToggle" role="switch" aria-checked="false"
-            aria-label="Cambiar entre tema claro y oscuro" title="Tema claro / oscuro">
+          <button class="theme-toggle" id="themeToggle" role="switch" aria-checked="false" aria-label="Cambiar entre tema claro y oscuro" title="Tema claro / oscuro">
             <span class="tt-thumb">
-              <svg class="tt-icon tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" aria-hidden="true">
+              <svg class="tt-icon tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="4"></circle>
-                <path
-                  d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.3 11.3 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.3-11.3 1.4-1.4">
+                <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.3 11.3 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.3-11.3 1.4-1.4">
                 </path>
               </svg>
-              <svg class="tt-icon tt-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <svg class="tt-icon tt-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
               </svg>
             </span>
@@ -71,8 +75,11 @@
           <div class="chart-title-group">
             <span class="chart-symbol" id="chartSymbol">--</span>
             <span class="chart-name" id="chartName">--</span>
-            <span class="chart-price" id="chartPrice">--</span>
-            <span class="chart-change" id="chartChange">--</span>
+            <!-- Cuadro de cotización: verde (alza) / rojo (baja), letras blancas -->
+            <div class="chart-quote" id="chartQuote">
+              <span class="chart-price" id="chartPrice">--</span>
+              <span class="chart-change" id="chartChange">--</span>
+            </div>
           </div>
           <div class="timeframes" id="timeframes" role="group" aria-label="Período del gráfico">
             <button class="tf-btn active" data-tf="1D">1D</button>
@@ -121,8 +128,7 @@
         <span class="footer-text">
           Datos históricos via Cloudflare
           <a href="https://www.cloudflare.com/" target="_blank" rel="noopener" aria-label="Cloudflare">
-            <img src="https://speaks-code.github.io/dashboard/stock_quotes/img/cloudflare-svgrepo-com.svg"
-              alt="Cloudflare">
+            <img src="https://speaks-code.github.io/dashboard/stock_quotes/img/cloudflare-svgrepo-com.svg" alt="Cloudflare">
           </a>
           D1 + Finnhub
           <a href="https://finnhub.io/" target="_blank" rel="noopener" aria-label="Finnhub">
@@ -136,7 +142,7 @@
       </footer>
     </div>
 
-    <script src="https://speaks-code.github.io/dashboard/stock_quotes/js/js_dashboard.js"></script>
+    <script src="https://speaks-code.github.io/dashboard/stock_quotes/js/js_dashboard_2.js"></script>
   </body>
   <!-- Pagina bajo licencia hjn -->
 
